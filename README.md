@@ -9,8 +9,10 @@ A l'heure actuelle, le logiciel gère seulement l'enregistrement vidéo et audio
 Pour le moment, le projet n'est qu'à l'état de PoC personnel et n'est pas propres notamment niveau architecture, Documentation, tests.
 De grands changements logiciels vont arriver :
 
+- [ ] Gestion de la langue et des traductions
 - [ ] Passage de la lib Raspicam modifiée à une gestion intégrée dans le projet pour la capture vidéo et photo.
 - [ ] Changement d'architecture vers un modèle MVC
+- [ ] Passer dans un format docker si possible
 - [ ] Passage sur un service de fond sur les principales fonctionnalités pour permettre de créer des différents front end. Notamment sur des appareils distant.
 - [ ] Passer la gestion de la preview sur un stream (RMTP?) de faible latence de préférence
 - [ ] Découpler le front Qt de la base du service

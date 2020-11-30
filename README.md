@@ -9,7 +9,8 @@ A l'heure actuelle, le logiciel gère seulement l'enregistrement vidéo et audio
 Pour le moment, le projet n'est qu'à l'état de PoC personnel et n'est pas propres notamment niveau architecture, Documentation, tests.
 De grands changements logiciels vont arriver :
 
-- [ ] Passage de la lib Raspicam modifiée à une gestion intégrée dans le projet pour la capture vidéo et photo.
+- [x] Passage de la lib Raspicam modifiée à une gestion intégrée dans le projet pour la capture vidéo et photo.
+- [ ] Ajout du support de la photo (Still).
 - [ ] Changement d'architecture vers un modèle MVC
 - [ ] Passage sur un service de fond sur les principales fonctionnalités pour permettre de créer des différents front end. Notamment sur des appareils distant.
 - [ ] Passer la gestion de la preview sur un stream (RMTP?) de faible latence de préférence
@@ -36,10 +37,6 @@ https://github.com/leandromoreira/ffmpeg-libav-tutorial
 
 https://github.com/momarkhan/ffmpeg_pcm_f32le_encoder/blob/master/f32le_transcode.c
 
-## lib video/Camera (MMAL API)
 
-https://github.com/rmsalinas/raspicam
-
-http://www.jvcref.com/files/PI/documentation/html/
-
-https://picamera.readthedocs.io/en/release-1.13/api_mmalobj.html
+## RekkonMMALCamera
+https://github.com/Otaze/RekkonMMALCamera

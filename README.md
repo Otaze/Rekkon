@@ -11,7 +11,10 @@ De grands changements logiciels vont arriver :
 
 - [x] Passage de la lib Raspicam modifiée à une gestion intégrée dans le projet pour la capture vidéo et photo.
 - [ ] Ajout du support de la photo (Still).
+- [ ] Gestion de la langue et des traductions
+- [ ] Passage de la lib Raspicam modifiée à une gestion intégrée dans le projet pour la capture vidéo et photo.
 - [ ] Changement d'architecture vers un modèle MVC
+- [ ] Passer dans un format docker si possible
 - [ ] Passage sur un service de fond sur les principales fonctionnalités pour permettre de créer des différents front end. Notamment sur des appareils distant.
 - [ ] Passer la gestion de la preview sur un stream (RMTP?) de faible latence de préférence
 - [ ] Découpler le front Qt de la base du service
@@ -38,5 +41,13 @@ https://github.com/leandromoreira/ffmpeg-libav-tutorial
 https://github.com/momarkhan/ffmpeg_pcm_f32le_encoder/blob/master/f32le_transcode.c
 
 
+<<<<<<< HEAD
 ## RekkonMMALCamera
 https://github.com/Otaze/RekkonMMALCamera
+=======
+https://github.com/rmsalinas/raspicam
+
+http://www.jvcref.com/files/PI/documentation/html/
+
+https://picamera.readthedocs.io/en/release-1.13/api_mmalobj.html
+>>>>>>> f4d319169e8d93159821f80ae96e3e5fb546ee1b

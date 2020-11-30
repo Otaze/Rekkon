@@ -15,12 +15,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+
+
 SOURCES += \
     audioworker.cpp \
     cameraworker.cpp \
     main.cpp \
     mainwindow.cpp \
-    raspicamworker.cpp \
+    rekkoncamworker.cpp \
     recordworker.cpp \
     settings.cpp \
     settingsstructure.cpp \
@@ -35,7 +37,7 @@ HEADERS += \
     audioworker.h \
     cameraworker.h \
     mainwindow.h \
-    raspicamworker.h \
+    rekkoncamworker.h \
     recordworker.h \
     settings.h \
     settingsstructure.h \
@@ -43,8 +45,7 @@ HEADERS += \
     videolist.h \
     videoplay.h \
     videorecord.h \
-    videothumbnailwidget.h \
-    ./boost/boost
+    videothumbnailwidget.h
 
 FORMS += \
     mainwindow.ui \
@@ -67,15 +68,18 @@ RESOURCES += \
     resources.qrc
 
 unix:INCLUDEPATH += \
-        ./boost \
         /usr/include/opencv4/ \
         /usr/include/opencv4/opencv2/ \
         /usr/include/raspicam \
         /usr/include/portaudiocpp \
-        /usr/include/arm-linux-gnuabihf
+        /usr/include/arm-linux-gnuabihf \
+        /usr/include/rekkon_mmal_camera \
+        /usr/include/interface \
+        /opt/vc/include/interface
         
-unix: LIBS += -lraspicam_cv -lraspicam -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
+#unix: LIBS += -lraspicam_cv -lraspicam -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
 
+unix: LIBS += -lrekkon_mmal_camera -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
 
 
 

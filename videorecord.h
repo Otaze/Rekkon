@@ -6,7 +6,7 @@
 #include <QTimeZone>
 #include <cameraworker.h>
 #include <audioworker.h>
-#include <raspicamworker.h>
+#include <rekkoncamworker.h>
 #include <recordworker.h>
 #include <QThread>
 #include <QTimer>
@@ -51,16 +51,17 @@ private slots:
 signals:
     void showVideoList();
     void showSettings();
-    void openRaspiCamera();
-    void releaseCamera();
+    //void openRaspiCamera();
+    //void releaseCamera();
     void sendSetupCam2(int);
     void pauseCamera();
     void resumeCamera();
-    void setImageSize(const unsigned int width,const  unsigned int height);
+    void setVideoPreviewSize(const unsigned int width,const  unsigned int height);
+    void setVideoRecordSize(const unsigned int width,const  unsigned int height);
     void setRotation(const unsigned int rotation);
     void setCameraFPS(const unsigned int fps);
-    void startRecord(std::string* filepath);
-    void stopRecord();
+    void startVideoRecord(std::string* filepath);
+    void stopVideoRecord();
     void pauseRecord();
     void resumeRecord();
 
@@ -74,9 +75,11 @@ private:
     SettingsStructure* m_settings;
     bool m_isRecording;
     bool m_isPaused;
+    unsigned int m_preview_width;
+    unsigned int m_preview_height;
+    unsigned int m_record_width;
+    unsigned int m_record_height;
     unsigned int m_fps;
-    unsigned int m_width;
-    unsigned int m_height;
     unsigned int m_rotation;
     std::string* m_filepath_video;
     std::string* m_filepath_audio;

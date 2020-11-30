@@ -7,9 +7,11 @@ VideoRecord::VideoRecord(QWidget *parent) :
     m_screenshoting(false),
     m_isRecording(false),
     m_isPaused(false),
+    m_preview_width(960),
+    m_preview_height(540),
+    m_record_width(1920),
+    m_record_height(1080),
     m_fps(30),
-    m_width(1920),
-    m_height(1080),
     m_rotation(0)
 {
      ui->setupUi(this);
@@ -30,10 +32,10 @@ VideoRecord::VideoRecord(QWidget *parent) :
 
      setup();
 
-     emit setImageSize(m_width,m_height);
+     emit setVideoPreviewSize(m_preview_width,m_preview_height);
+     emit setVideoRecordSize(m_record_width,m_record_height);
      emit setRotation(m_rotation);
      emit setCameraFPS(m_fps);
-     emit openRaspiCamera();
 
 }
 VideoRecord::~VideoRecord()
@@ -69,23 +71,24 @@ void VideoRecord::setup()
     m_audioWorker = new AudioWorker;
 
     m_camThread = new QThread();
-    RaspiCamWorker *worker = new RaspiCamWorker();
+    RekkonCamWorker *worker = new RekkonCamWorker();
     QTimer *workerTrigger = new QTimer();
     workerTrigger->setInterval(0);
 
     connect(workerTrigger, SIGNAL(timeout()), worker, SLOT(signalProcessImage()));
     connect(m_camThread, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(m_camThread, SIGNAL(finished()), workerTrigger, SLOT(deleteLater()));
-    connect(this, SIGNAL(openRaspiCamera()), worker, SLOT(openCamera()));
-    connect(this, SIGNAL(releaseCamera()), worker, SLOT(releaseCamera()));
+    //connect(this, SIGNAL(openRaspiCamera()), worker, SLOT(openCamera()));
+    //connect(this, SIGNAL(releaseCamera()), worker, SLOT(releaseCamera()));
     connect(this, SIGNAL(resumeCamera()), worker, SLOT(resume()));
     connect(this, SIGNAL(pauseCamera()), worker, SLOT(pause()));
     connect(this, SIGNAL(setCameraFPS(const unsigned int)), worker, SLOT(setCameraFPS(const unsigned int)));
     connect(this, SIGNAL(setRotation(const unsigned int)), worker, SLOT(setRotation(const unsigned int)));
-    connect(this, SIGNAL(setImageSize(const unsigned int,const unsigned int)), worker, SLOT(setImageSize(const unsigned int,const unsigned int)));
+    connect(this, SIGNAL(setVideoPreviewSize(const unsigned int,const unsigned int)), worker, SLOT(setVideoPreviewSize(const unsigned int,const unsigned int)));
+    connect(this, SIGNAL(setVideoRecordSize(const unsigned int,const unsigned int)), worker, SLOT(setVideoRecordSize(const unsigned int,const unsigned int)));
     connect(worker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(receiveFrame(cv::Mat*)));
-    connect(this, SIGNAL(startRecord(std::string*)), worker, SLOT(startRecord(std::string*)));
-    connect(this, SIGNAL(stopRecord()), worker, SLOT(stopRecord()));
+    connect(this, SIGNAL(startVideoRecord(std::string*)), worker, SLOT(startVideoRecord(std::string*)));
+    connect(this, SIGNAL(stopVideoRecord()), worker, SLOT(stopVideoRecord()));
     connect(worker, SIGNAL(errorRecord()), this, SLOT(errorRecord()));
 
     workerTrigger->start();
@@ -154,12 +157,10 @@ bool VideoRecord::isRecording() const
 
 void VideoRecord::receiveFrame(cv::Mat* frame)
 {
-
-    QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_BGR888);
+    QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_RGB888);
     QPixmap pixmap = QPixmap::fromImage(output);
     pixmap = pixmap.scaledToWidth(ui->vidWidCam1Label->width(),Qt::FastTransformation);
     ui->vidWidCam1Label->setPixmap(pixmap);
-
 }
 
 void VideoRecord::receiveFrameCamera2(cv::Mat* frame)
@@ -195,7 +196,7 @@ void VideoRecord::startRecordVideo()
         m_filepath_video = new std::string(m_settings->m_videoFolder +"/"+date + *m_ext_video);
         m_filepath_audio = new std::string(m_settings->m_videoFolder +"/"+date + *m_ext_audio);
 
-        emit startRecord(m_filepath_video);
+        emit startVideoRecord(m_filepath_video);
         if (m_audioWorker->isInitialized())
             m_audioWorker->startRecord(*m_filepath_audio);
     }
@@ -222,7 +223,7 @@ void VideoRecord::stopRecordVideo()
     ui->settingsBtn->show();
     ui->closeAppBtn->show();
 
-    emit stopRecord();
+    emit stopVideoRecord();
     if (m_audioWorker->isInitialized())
         m_audioWorker->stopRecord();
 
@@ -297,8 +298,6 @@ void VideoRecord::on_mediaBtn_clicked()
 
 void VideoRecord::on_closeAppBtn_clicked()
 {
-    emit releaseCamera();
-    sleep(2);
     QApplication::quit();
 }
 

@@ -9,12 +9,11 @@ VideoList::VideoList(QWidget *parent) :
 {
     ui->setupUi(this);
     m_thumbnailWidVector = new std::vector<VideoThumbnailWidget*>;
-    m_settings = new SettingsStructure;
+    m_settings = SettingsStructure::instance();
 }
 
 VideoList::~VideoList()
 {
-    delete m_settings;
     delete m_thumbnailWidVector;
     delete ui;
 }

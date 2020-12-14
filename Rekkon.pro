@@ -81,6 +81,9 @@ unix:INCLUDEPATH += \
 
 unix: LIBS += -lrekkon_mmal_camera -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
 
+DISTFILES += \
+    icons/camera.png
+
 
 
 

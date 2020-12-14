@@ -10,6 +10,7 @@
         <file>icons/back.png</file>
         <file>icons/close.png</file>
         <file>icons/refresh.png</file>
+        <file>icons/camera.png</file>
     </qresource>
     <qresource prefix="/conf"/>
     <qresource prefix="/"/>

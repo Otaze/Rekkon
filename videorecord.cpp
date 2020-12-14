@@ -7,6 +7,7 @@ VideoRecord::VideoRecord(QWidget *parent) :
     m_screenshoting(false),
     m_isRecording(false),
     m_isPaused(false),
+    m_isStillModeEnabled(false),
     m_preview_width(960),
     m_preview_height(540),
     m_record_width(1920),
@@ -15,28 +16,27 @@ VideoRecord::VideoRecord(QWidget *parent) :
     m_rotation(0)
 {
      ui->setupUi(this);
-     m_settings = new SettingsStructure;
+     m_settings = SettingsStructure::instance();
      m_settings->load();
 
 
      setFixedSize(800,480);
      setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    /* QGraphicsDropShadowEffect * secondVidDropShadow = new QGraphicsDropShadowEffect;
-     secondVidDropShadow->setOffset(5);
-     secondVidDropShadow->setBlurRadius(15);
-     ui->vidWidCam2Label->setGraphicsEffect(secondVidDropShadow);*/
-     ui->vidWidCam2Label->hide();
+
 
      m_ext_video = new string(".h264");
      m_ext_audio = new string(".aac");
+     m_ext_still = new string(".jpg");
+
+     ui->btnFrame->layout()->removeWidget(ui->stopBtn);
+     ui->stopBtn->hide();
+     ui->btnFrame->layout()->removeWidget(ui->captureStillBtn);
+     ui->captureStillBtn->hide();
+     ui->btnFrame->layout()->removeWidget(ui->pauseBtn);
+     ui->pauseBtn->hide();
+
 
      setup();
-
-     emit setVideoPreviewSize(m_preview_width,m_preview_height);
-     emit setVideoRecordSize(m_record_width,m_record_height);
-     emit setRotation(m_rotation);
-     emit setCameraFPS(m_fps);
-
 }
 VideoRecord::~VideoRecord()
 {
@@ -47,7 +47,6 @@ VideoRecord::~VideoRecord()
    delete m_camThread;
    delete m_cam2Thread;
    delete m_recThread;
-   delete m_settings;
    delete m_filepath_audio;
    delete m_filepath_video;
    delete m_ext_audio;
@@ -59,7 +58,7 @@ VideoRecord::~VideoRecord()
 
 void VideoRecord::removeMuxThread()
 {
-    if (m_mux_clean_thread != nullptr)
+    if (m_mux_clean_thread)
     {
         m_mux_clean_thread->join();
         delete m_mux_clean_thread;
@@ -69,30 +68,25 @@ void VideoRecord::removeMuxThread()
 void VideoRecord::setup()
 {
     m_audioWorker = new AudioWorker;
+    m_rekkon_cam_worker = new RekkonCamWorker();
+    setRekkonCamSizeSettings();
+    reloadCamera();
+    reloadCameraMode();
+    m_rekkon_cam_worker->setRotation(m_rotation);
+    m_rekkon_cam_worker->setCameraFPS(m_fps);
 
     m_camThread = new QThread();
-    RekkonCamWorker *worker = new RekkonCamWorker();
     QTimer *workerTrigger = new QTimer();
     workerTrigger->setInterval(0);
 
-    connect(workerTrigger, SIGNAL(timeout()), worker, SLOT(signalProcessImage()));
-    connect(m_camThread, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(workerTrigger, SIGNAL(timeout()), m_rekkon_cam_worker, SLOT(signalProcessImage()));
+    connect(m_camThread, SIGNAL(finished()), m_rekkon_cam_worker, SLOT(deleteLater()));
     connect(m_camThread, SIGNAL(finished()), workerTrigger, SLOT(deleteLater()));
-    //connect(this, SIGNAL(openRaspiCamera()), worker, SLOT(openCamera()));
-    //connect(this, SIGNAL(releaseCamera()), worker, SLOT(releaseCamera()));
-    connect(this, SIGNAL(resumeCamera()), worker, SLOT(resume()));
-    connect(this, SIGNAL(pauseCamera()), worker, SLOT(pause()));
-    connect(this, SIGNAL(setCameraFPS(const unsigned int)), worker, SLOT(setCameraFPS(const unsigned int)));
-    connect(this, SIGNAL(setRotation(const unsigned int)), worker, SLOT(setRotation(const unsigned int)));
-    connect(this, SIGNAL(setVideoPreviewSize(const unsigned int,const unsigned int)), worker, SLOT(setVideoPreviewSize(const unsigned int,const unsigned int)));
-    connect(this, SIGNAL(setVideoRecordSize(const unsigned int,const unsigned int)), worker, SLOT(setVideoRecordSize(const unsigned int,const unsigned int)));
-    connect(worker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(receiveFrame(cv::Mat*)));
-    connect(this, SIGNAL(startVideoRecord(std::string*)), worker, SLOT(startVideoRecord(std::string*)));
-    connect(this, SIGNAL(stopVideoRecord()), worker, SLOT(stopVideoRecord()));
-    connect(worker, SIGNAL(errorRecord()), this, SLOT(errorRecord()));
+    connect(m_rekkon_cam_worker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(receiveFrame(cv::Mat*)));
+    connect(m_rekkon_cam_worker, SIGNAL(errorRecord()), this, SLOT(errorRecord()));
 
     workerTrigger->start();
-    worker->moveToThread(m_camThread);
+    m_rekkon_cam_worker->moveToThread(m_camThread);
     workerTrigger->moveToThread(m_camThread);
 
     m_camThread->start();
@@ -138,15 +132,67 @@ void VideoRecord::setup()
     m_recThread->start();*/
 }
 
+void VideoRecord::restartVideoRecordProcessing()
+{
+    // reload cam settings
+    setRekkonCamSizeSettings();
+    startCameraProcessing();
+}
+
+void VideoRecord::stopVideoRecordProcessing()
+{
+    if (m_isRecording) stopRecordVideo();
+    stopCameraProcessing();
+}
+
+void VideoRecord::setRekkonCamSizeSettings()
+{
+    m_rekkon_cam_worker->setVideoRecordSize(m_settings->m_recordVideoWidth, m_settings->m_recordVideoHeight);
+    m_rekkon_cam_worker->setStillRecordSize(m_settings->m_recordStillWidth, m_settings->m_recordStillHeight);
+    m_rekkon_cam_worker->setVideoPreviewSize(m_settings->m_previewVideoWidth, m_settings->m_previewVideoHeight);
+    m_rekkon_cam_worker->setStillPreviewSize(m_settings->m_previewStillWidth, m_settings->m_previewStillHeight);
+}
+
+void VideoRecord::reloadCamera()
+{
+    m_rekkon_cam_worker->releaseCamera();
+    m_rekkon_cam_worker->openCamera();
+}
+
+
+void VideoRecord::reloadCameraMode()
+{
+    // TO DO: change to right function when photo functions are ready in RekkonMMALCamera
+    if (m_isStillModeEnabled)
+    {
+        cerr << " mode Still enabled" << endl;
+        m_rekkon_cam_worker->stopVideoRecord();
+        m_rekkon_cam_worker->stopVideoPreview();
+        m_rekkon_cam_worker->startStillPreview();
+    } else
+    {
+
+        cerr << " mode video enabled" << endl;
+        m_rekkon_cam_worker->stopVideoRecord();
+        m_rekkon_cam_worker->stopStillPreview();
+        m_rekkon_cam_worker->startVideoPreview();
+    }
+
+}
+
 void VideoRecord::startCameraProcessing()
 {
-    emit resumeCamera();
+    reloadCameraMode();
+    m_rekkon_cam_worker->resume();
 }
 
 void VideoRecord::stopCameraProcessing()
 {
-    if (m_isRecording) stopRecordVideo();
-    emit pauseCamera();
+    m_rekkon_cam_worker->pause();
+    m_rekkon_cam_worker->stopVideoPreview();
+    m_rekkon_cam_worker->stopVideoRecord();
+    m_rekkon_cam_worker->stopStillPreview();
+
 }
 
 
@@ -158,26 +204,24 @@ bool VideoRecord::isRecording() const
 void VideoRecord::receiveFrame(cv::Mat* frame)
 {
     QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_RGB888);
+    //QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_BGR888);
     QPixmap pixmap = QPixmap::fromImage(output);
-    pixmap = pixmap.scaledToWidth(ui->vidWidCam1Label->width(),Qt::FastTransformation);
+    //pixmap = pixmap.scaledToWidth(ui->vidWidCam1Label->width(),Qt::FastTransformation);
+    pixmap = pixmap.scaledToHeight(ui->vidWidCam1Label->height(),Qt::FastTransformation);
     ui->vidWidCam1Label->setPixmap(pixmap);
+    ui->vidWidCam1Label->setAlignment(Qt::AlignHCenter);
 }
 
-void VideoRecord::receiveFrameCamera2(cv::Mat* frame)
-{
-    QImage output((const unsigned char *)frame->data, frame->cols, frame ->rows, QImage::Format_RGB888);
-    QPixmap pixmap = QPixmap::fromImage(output);
-    pixmap = pixmap.scaledToWidth(ui->vidWidCam2Label->width(),Qt::FastTransformation);
-    ui->vidWidCam2Label->setPixmap(pixmap);
-}
 
 void VideoRecord::startRecordVideo()
 {
     if (m_isPaused)
     {
         m_isPaused = false;
+
+        ui->btnFrame->layout()->addWidget(ui->pauseBtn);
         ui->pauseBtn->show();
-        emit resumeRecord();
+        //emit resumeRecord();
         if (m_audioWorker->isInitialized())
             m_audioWorker->resumeRecord();
     } else {
@@ -186,6 +230,12 @@ void VideoRecord::startRecordVideo()
         ui->mediaBtn->hide();
         ui->settingsBtn->hide();
         ui->closeAppBtn->hide();
+        ui->stillVideoModeBtn->hide();
+        ui->btnFrame->layout()->addWidget(ui->pauseBtn);
+        ui->pauseBtn->show();
+        ui->btnFrame->layout()->addWidget(ui->stopBtn);
+        ui->stopBtn->show();
+
 
         // create filename and path
         auto t = std::time(nullptr);
@@ -196,7 +246,7 @@ void VideoRecord::startRecordVideo()
         m_filepath_video = new std::string(m_settings->m_videoFolder +"/"+date + *m_ext_video);
         m_filepath_audio = new std::string(m_settings->m_videoFolder +"/"+date + *m_ext_audio);
 
-        emit startVideoRecord(m_filepath_video);
+        m_rekkon_cam_worker->startVideoRecord(m_filepath_video);
         if (m_audioWorker->isInitialized())
             m_audioWorker->startRecord(*m_filepath_audio);
     }
@@ -207,9 +257,18 @@ void VideoRecord::startRecordVideo()
 void VideoRecord::pauseRecordVideo()
 {
     m_isPaused = true;
+
+    ui->btnFrame->layout()->removeWidget(ui->pauseBtn);
     ui->pauseBtn->hide();
+    ui->btnFrame->layout()->removeWidget(ui->stopBtn);
+    ui->stopBtn->hide();
+
+    ui->btnFrame->layout()->addWidget(ui->recordBtn);
     ui->recordBtn->show();
-    emit pauseRecord();
+    ui->btnFrame->layout()->addWidget(ui->stopBtn);
+    ui->stopBtn->show();
+
+    //emit pauseRecord();
     if (m_audioWorker->isInitialized())
         m_audioWorker->pauseRecord();
 }
@@ -218,16 +277,23 @@ void VideoRecord::stopRecordVideo()
 {
     // Disable record mode
     // show hidden buttons by record mode
-    ui->mediaBtn->show();
+    ui->btnFrame->layout()->removeWidget(ui->stopBtn);
+    ui->stopBtn->hide();
+    ui->btnFrame->layout()->removeWidget(ui->pauseBtn);
+    ui->pauseBtn->hide();
+
+    ui->btnFrame->layout()->addWidget(ui->recordBtn);
     ui->recordBtn->show();
+
     ui->settingsBtn->show();
     ui->closeAppBtn->show();
+    ui->stillVideoModeBtn->show();
+    ui->mediaBtn->show();
 
-    emit stopVideoRecord();
+    m_rekkon_cam_worker->stopVideoRecord();
     if (m_audioWorker->isInitialized())
         m_audioWorker->stopRecord();
 
-    removeMuxThread();
     m_mux_clean_thread = new std::thread(muxVideoAudioAndClean,m_filepath_video, m_filepath_audio, m_ext_video,m_fps, m_audioWorker->isInitialized());
 
 }
@@ -261,11 +327,18 @@ void VideoRecord::errorRecord()
     stopRecordVideo();
 }
 
-void VideoRecord::screenshot()
+
+void VideoRecord::captureStill()
 {
-    QDateTime currentDate = QDateTime::currentDateTime();
-    currentDate.setTimeZone(QTimeZone::systemTimeZone());
-    m_screenshoting = false;
+    // create filename and path
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    std::stringstream ss;
+    ss << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S");
+    std::string date(ss.str());
+    m_filepath_still = new std::string(m_settings->m_videoFolder +"/"+date + *m_ext_still);
+    m_rekkon_cam_worker->startStillRecord(m_filepath_still);
+
 }
 
 
@@ -285,11 +358,6 @@ void VideoRecord::on_stopBtn_clicked()
 }
 
 
-void VideoRecord::on_screenshotBtn_clicked()
-{
-    m_screenshoting = true;
-}
-
 void VideoRecord::on_mediaBtn_clicked()
 {
     stopCameraProcessing();
@@ -298,11 +366,49 @@ void VideoRecord::on_mediaBtn_clicked()
 
 void VideoRecord::on_closeAppBtn_clicked()
 {
+
+    m_rekkon_cam_worker->pause();
+    /*if (isRecording()){
+        stopRecordVideo();
+        m_mux_clean_thread->join();
+    }*/
+    stopVideoRecordProcessing();
+    m_camThread->quit();
     QApplication::quit();
 }
 
 void VideoRecord::on_settingsBtn_clicked()
 {
-    stopCameraProcessing();
+    stopVideoRecordProcessing();
     emit showSettings();
+}
+
+void VideoRecord::on_stillVideoModeBtn_clicked()
+{
+    stopVideoRecordProcessing();
+    m_isStillModeEnabled = !m_isStillModeEnabled;
+    if (m_isStillModeEnabled)
+    {
+        ui->stillVideoModeBtn->setText("Video");
+        ui->btnFrame->layout()->removeWidget(ui->recordBtn);
+        ui->recordBtn->hide();
+        ui->btnFrame->layout()->addWidget(ui->captureStillBtn);
+        ui->captureStillBtn->show();
+    }
+    else
+    {
+        ui->btnFrame->layout()->addWidget(ui->recordBtn);
+        ui->recordBtn->show();
+        ui->btnFrame->layout()->removeWidget(ui->captureStillBtn);
+        ui->captureStillBtn->hide();
+        ui->stillVideoModeBtn->setText("Photo");
+    }
+
+
+    startCameraProcessing();
+}
+
+void VideoRecord::on_captureStillBtn_clicked()
+{
+    captureStill();
 }

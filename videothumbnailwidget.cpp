@@ -13,7 +13,7 @@ VideoThumbnailWidget::VideoThumbnailWidget(QWidget *parent) :
     connect(this, SIGNAL(sendSetupCam(std::string)), m_vidWorker, SLOT(setupCamera(std::string)));
     connect(this, SIGNAL(getImageFromPositionInMillisec(long)), m_vidWorker, SLOT(getImageFromPositionInMillisec(long)));
     connect(this, SIGNAL(releaseCamera()), m_vidWorker, SLOT(releaseCamera()));
-    connect(m_vidWorker, SIGNAL(sendFrame(QImage)), this, SLOT(processImage(QImage)));
+    connect(m_vidWorker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(processImage(cv::Mat*)));
 
 
     m_mediaSrcPath = new QString;
@@ -24,7 +24,6 @@ void VideoThumbnailWidget::setMediaSource(const QString mediaPath)
     delete m_mediaSrcPath;
     m_mediaSrcPath = new QString(mediaPath);
     emit sendSetupCam(m_mediaSrcPath->toStdString());
-
 
 }
 
@@ -56,12 +55,12 @@ const QString* VideoThumbnailWidget::getMediaSource()
     return this->m_mediaSrcPath;
 }
 
-void VideoThumbnailWidget::processImage(const QImage image)
+void VideoThumbnailWidget::processImage(cv::Mat* image)
 {
     updateDuration();
     updateTitle();
     qDebug() << "processed Image thumbnail";
-    QPixmap pixmap = QPixmap::fromImage(image);
+    QPixmap pixmap = QPixmap::fromImage(QImage((unsigned char*) image->data, image->cols, image->rows, QImage::Format_BGR888));
     pixmap = pixmap.scaledToWidth(ui->thumbnailWidget->width(),Qt::FastTransformation);
     ui->thumbnailWidget->setPixmap(pixmap);
     emit releaseCamera();

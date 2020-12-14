@@ -54,7 +54,7 @@ void MainWindow::setToVideoListView(){
 }
 
 void MainWindow::setToVideoRecordView(){
-    videoRecordWidget->startCameraProcessing();
+    videoRecordWidget->restartVideoRecordProcessing();
     changeVideoView(MainWindow::VIDEORECORD_WIDGET);
 }
 

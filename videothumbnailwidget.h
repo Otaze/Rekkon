@@ -24,7 +24,7 @@ public:
     const QString* getMediaSource();
 
 public slots:
-    void processImage(const QImage image);
+    void processImage(cv::Mat* image);
 
 signals:
     void sendSetupCam(std::string);

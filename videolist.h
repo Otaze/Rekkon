@@ -5,7 +5,7 @@
 #include <vector>
 #include "videothumbnailwidget.h"
 #include <filesystem>
-#include "settingsstructure.h"
+#include "models/settingsstructure.h"
 
 namespace Ui {
 class VideoList;

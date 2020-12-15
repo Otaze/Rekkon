@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QVideoWidget>
-#include "utils.h"
+#include "utils/utils.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

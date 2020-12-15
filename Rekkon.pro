@@ -18,15 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    audioworker.cpp \
+    controllers/audioworker.cpp \
     cameraworker.cpp \
+    controllers/mediaservice.cpp \
     main.cpp \
     mainwindow.cpp \
-    rekkoncamworker.cpp \
-    recordworker.cpp \
+    models/mediafile.cpp \
+    controllers/rekkoncamworker.cpp \
     settings.cpp \
-    settingsstructure.cpp \
-    utils.cpp \
+    models/settingsstructure.cpp \
+    utils/utils.cpp \
     videolist.cpp \
     videoplay.cpp \
     videorecord.cpp \
@@ -34,14 +35,15 @@ SOURCES += \
 
 
 HEADERS += \
-    audioworker.h \
+    controllers/audioworker.h \
     cameraworker.h \
+    controllers/mediaservice.h \
     mainwindow.h \
-    rekkoncamworker.h \
-    recordworker.h \
+    models/mediafile.h \
+    controllers/rekkoncamworker.h \
     settings.h \
-    settingsstructure.h \
-    utils.h \
+    models/settingsstructure.h \
+    utils/utils.h \
     videolist.h \
     videoplay.h \
     videorecord.h \
@@ -80,9 +82,6 @@ unix:INCLUDEPATH += \
 #unix: LIBS += -lraspicam_cv -lraspicam -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
 
 unix: LIBS += -lrekkon_mmal_camera -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
-
-DISTFILES += \
-    icons/camera.png
 
 
 

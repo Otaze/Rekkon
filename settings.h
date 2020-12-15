@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 #include <QWidget>
-#include <settingsstructure.h>
+#include <models/settingsstructure.h>
 #include <QIntValidator>
 
 namespace Ui {

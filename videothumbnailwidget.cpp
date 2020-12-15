@@ -9,10 +9,6 @@ VideoThumbnailWidget::VideoThumbnailWidget(QWidget *parent) :
     ui->setupUi(this);
 
     m_vidWorker = new CameraWorker();
-
-    connect(this, SIGNAL(sendSetupCam(std::string)), m_vidWorker, SLOT(setupCamera(std::string)));
-    connect(this, SIGNAL(getImageFromPositionInMillisec(long)), m_vidWorker, SLOT(getImageFromPositionInMillisec(long)));
-    connect(this, SIGNAL(releaseCamera()), m_vidWorker, SLOT(releaseCamera()));
     connect(m_vidWorker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(processImage(cv::Mat*)));
 
 

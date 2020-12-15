@@ -2,7 +2,7 @@
 #define VIDEOPREVIEWWIDGET_H
 
 #include <QWidget>
-#include "utils.h"
+#include "utils/utils.h"
 #include <filesystem>
 #include <QFontMetrics>
 #include "cameraworker.h"

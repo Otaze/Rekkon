@@ -37,9 +37,9 @@ void VideoList::refreshList()
         {
             //QThread::msleep(500);
             VideoThumbnailWidget* thumbnail = addVideoThumbnail( QString::fromStdString(file.path().string()));
-            QCoreApplication::processEvents();
+            //QCoreApplication::processEvents();
 
-            thumbnail->getImageFromPositionInMillisec(3000);
+            thumbnail->getImageFromPositionInMillisec(1000);
         }
 
     }

@@ -9,7 +9,7 @@ VideoList::VideoList(QWidget *parent) :
 {
     ui->setupUi(this);
     m_thumbnailWidVector = new std::vector<VideoThumbnailWidget*>;
-    m_settings = SettingsStructure::instance();
+    m_mediaService = MediaService::instance();
 }
 
 VideoList::~VideoList()
@@ -20,34 +20,27 @@ VideoList::~VideoList()
 
 void VideoList::refreshList()
 {
-    m_settings->load();
-    std::string path = m_settings->m_videoFolder;
+
     for (VideoThumbnailWidget* vidThumbWid : *m_thumbnailWidVector)
     {
         ui->vidListGridLayout->removeWidget(vidThumbWid);
-        delete vidThumbWid;
+        //delete vidThumbWid;
     }
     m_thumbnailWidVector->clear();
-    for (const auto & file : std::filesystem::recursive_directory_iterator(path))
+
+    m_mediaService->refreshList();
+    for(MediaFile * file : m_mediaService->mediaFileList())
     {
-        if (file.path().extension() == ".mkv"
-                || file.path().extension() == ".mp4"
-                || file.path().extension() == ".avi"
-                || file.path().extension() == ".webm" )
-        {
-            //QThread::msleep(500);
-            VideoThumbnailWidget* thumbnail = addVideoThumbnail( QString::fromStdString(file.path().string()));
-            //QCoreApplication::processEvents();
-
-            thumbnail->getImageFromPositionInMillisec(1000);
-        }
-
+        addVideoThumbnail(file);
     }
-
+    for (VideoThumbnailWidget* vidThumbWid : *m_thumbnailWidVector)
+    {
+        vidThumbWid->updateUI();
+    }
 }
 
 
-VideoThumbnailWidget* VideoList::addVideoThumbnail(const QString filename)
+VideoThumbnailWidget* VideoList::addVideoThumbnail(MediaFile * mFile)
 {
     int16_t file_counter = ui->vidListGridLayout->count();
     int16_t columns_count = 3;
@@ -59,13 +52,13 @@ VideoThumbnailWidget* VideoList::addVideoThumbnail(const QString filename)
     ui->vidListGridLayout->setColumnStretch(file_column_counter, 1);
     ui->vidListGridLayout->addWidget(vidThumbWid, file_counter/ columns_count ,file_column_counter,1,1);
 
-    vidThumbWid->setMediaSource(filename);
     for (int i =0 ;i <= file_counter/ columns_count;i++) {
         ui->vidListGridLayout->setRowStretch(i, 1);
     }
     for (int i =0 ;i < columns_count;i++) {
         ui->vidListGridLayout->setColumnStretch(i, 1);
     }
+    vidThumbWid->setMediaFile(*mFile);
 
     return vidThumbWid;
 
@@ -85,9 +78,7 @@ bool VideoList::eventFilter(QObject *obj, QEvent *event) {
 
 
     if (event->type() == QEvent::MouseButtonRelease) {
-
-        emit selectVideoPlay(*(((VideoThumbnailWidget*)obj)->getMediaSource()));
-
+        emit selectVideoPlay(QString::fromStdString(((VideoThumbnailWidget*)obj)->mediaFile().filepath()));
     }
 
     return ret;

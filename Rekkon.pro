@@ -19,14 +19,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     controllers/audioworker.cpp \
-    cameraworker.cpp \
     controllers/mediaservice.cpp \
+    controllers/rekkoncamworker.cpp \
+    cameraworker.cpp \
     main.cpp \
     mainwindow.cpp \
     models/mediafile.cpp \
-    controllers/rekkoncamworker.cpp \
-    settings.cpp \
     models/settingsstructure.cpp \
+    settings.cpp \
     utils/utils.cpp \
     videolist.cpp \
     videoplay.cpp \
@@ -36,13 +36,13 @@ SOURCES += \
 
 HEADERS += \
     controllers/audioworker.h \
-    cameraworker.h \
     controllers/mediaservice.h \
+    controllers/rekkoncamworker.h \
+    cameraworker.h \
     mainwindow.h \
     models/mediafile.h \
-    controllers/rekkoncamworker.h \
-    settings.h \
     models/settingsstructure.h \
+    settings.h \
     utils/utils.h \
     videolist.h \
     videoplay.h \
@@ -78,10 +78,8 @@ unix:INCLUDEPATH += \
         /usr/include/rekkon_mmal_camera \
         /usr/include/interface \
         /opt/vc/include/interface
-        
-#unix: LIBS += -lraspicam_cv -lraspicam -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
 
-unix: LIBS += -lrekkon_mmal_camera -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat -lopencv_core -lopencv_videoio -lopencv_imgproc
+unix: LIBS += -lrekkon_mmal_camera -lportaudio -lportaudiocpp -lavcodec -lavutil -lavformat  -lopencv_imgproc  -lopencv_videoio -lopencv_core  -lopencv_imgproc -lopencv_imgcodecs
 
 
 

@@ -2,8 +2,10 @@
 #define MEDIAFILE_H
 
 #include <string>
+#include <opencv4/opencv2/opencv.hpp>
 
 using namespace std;
+using namespace cv;
 
 enum MediaType {
     Video,
@@ -18,18 +20,11 @@ public:
     string filepath,
     string filename,
     long duration,
-    unsigned char* thumbnail_image,
-    unsigned int thumbnail_width,
-    unsigned int thumbnail_height);
+    Mat * thumbnail);
 
 
     ~MediaFile();
 
-    unsigned int thumbnailHeight() const;
-
-    unsigned int thumbnailWidth() const;
-
-    unsigned char *thumbnailImage() const;;
 
     long duration() const;
 
@@ -39,15 +34,14 @@ public:
 
     MediaType type() const;
 
+    Mat *thumbnail() const;
+
 private:
     MediaType m_type;
     string m_filepath;
     string m_filename;
     long m_duration;
-    unsigned char* m_thumbnail_image;
-    unsigned int m_thumbnail_width;
-    unsigned int m_thumbnail_height;
-
+    Mat * m_thumbnail;
 
 
 };

@@ -4,60 +4,49 @@
 
 VideoThumbnailWidget::VideoThumbnailWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::VideoThumbnailWidget)
+    ui(new Ui::VideoThumbnailWidget),
+    m_mediafile(MediaType::Image,"","",-1,NULL)
 {
     ui->setupUi(this);
-
-    m_vidWorker = new CameraWorker();
-    connect(m_vidWorker, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(processImage(cv::Mat*)));
-
-
-    m_mediaSrcPath = new QString;
-}
-
-void VideoThumbnailWidget::setMediaSource(const QString mediaPath)
-{
-    delete m_mediaSrcPath;
-    m_mediaSrcPath = new QString(mediaPath);
-    emit sendSetupCam(m_mediaSrcPath->toStdString());
-
-}
-
-void VideoThumbnailWidget::updateTitle()
-{
-    QString title = QString::fromStdString(std::filesystem::path(m_mediaSrcPath->toUtf8().constData()).filename().string());
-    QFontMetrics metrics (ui->vidTitleLabel->font());
-
-
-    ui->vidTitleLabel->setText(metrics.elidedText(title,Qt::ElideRight,ui->vidTitleLabel->width()));
-}
-
-void VideoThumbnailWidget::updateDuration()
-{
-    qDebug() << m_vidWorker->duration();
-    ui->vidLengthLabel->setText(Utils::formatMillisecondsToDateString(m_vidWorker->duration()));
 }
 
 VideoThumbnailWidget::~VideoThumbnailWidget()
 {
-    emit releaseCamera();
-    delete m_vidWorker;
-    delete m_mediaSrcPath;
+
     delete ui;
 }
 
-const QString* VideoThumbnailWidget::getMediaSource()
+void VideoThumbnailWidget::setMediaFile(const MediaFile &mediafile)
 {
-    return this->m_mediaSrcPath;
+    m_mediafile = mediafile;
+    updateUI();
 }
 
-void VideoThumbnailWidget::processImage(cv::Mat* image)
+void VideoThumbnailWidget::updateUI()
 {
-    updateDuration();
-    updateTitle();
-    qDebug() << "processed Image thumbnail";
-    QPixmap pixmap = QPixmap::fromImage(QImage((unsigned char*) image->data, image->cols, image->rows, QImage::Format_BGR888));
-    pixmap = pixmap.scaledToWidth(ui->thumbnailWidget->width(),Qt::FastTransformation);
+    if (m_mediafile.type() == MediaType::Video)
+    {
+        ui->vidLengthLabel->setText(Utils::formatMillisecondsToDateString(m_mediafile.duration()));
+        ui->vidLengthLabel->show();
+    } else
+    {
+        ui->vidLengthLabel->hide();
+    }
+
+    QFontMetrics metrics (ui->vidTitleLabel->font());
+    ui->vidTitleLabel->setText(metrics.elidedText(QString::fromStdString(m_mediafile.filename()),Qt::ElideLeft,ui->vidTitleLabel->width()));
+
+    if (m_mediafile.thumbnail() == NULL) return;
+
+    QImage output((const unsigned char *) m_mediafile.thumbnail()->ptr(0), m_mediafile.thumbnail()->cols, m_mediafile.thumbnail()->rows, QImage::Format_BGR888);
+    QPixmap pixmap = QPixmap::fromImage(output);
+    pixmap = pixmap.scaledToWidth(ui->vidTitleLabel->width()+ui->vidLengthLabel->width(),Qt::FastTransformation);
+
     ui->thumbnailWidget->setPixmap(pixmap);
-    emit releaseCamera();
+    ui->thumbnailWidget->setAlignment(Qt::AlignHCenter);
+}
+
+MediaFile VideoThumbnailWidget::mediaFile() const
+{
+    return m_mediafile;
 }

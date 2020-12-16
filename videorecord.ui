@@ -401,7 +401,7 @@ padding:10px  10px;</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgba(52, 101, 164,250);</string>
+    <string notr="true">background-color: rgba(52, 101, 164,0);</string>
    </property>
    <property name="text">
     <string/>

@@ -3,10 +3,9 @@
 
 #include <QWidget>
 #include "utils/utils.h"
-#include <filesystem>
 #include <QFontMetrics>
-#include "cameraworker.h"
 #include <string>
+#include "models/mediafile.h"
 
 namespace Ui {
 class VideoThumbnailWidget;
@@ -20,24 +19,16 @@ class VideoThumbnailWidget : public QWidget
 public:
     explicit VideoThumbnailWidget(QWidget *parent = nullptr);
     ~VideoThumbnailWidget();
-    void setMediaSource(const QString mediaPath);
-    const QString* getMediaSource();
 
-public slots:
-    void processImage(cv::Mat* image);
 
-signals:
-    void sendSetupCam(std::string);
-    void getImageFromPositionInMillisec(long);
-    void releaseCamera();
+    void setMediaFile(const MediaFile &mediafile);
+    void updateUI();
 
+    MediaFile mediaFile() const;
 
 private:
-    void updateTitle();
-    void updateDuration();
     Ui::VideoThumbnailWidget *ui;
-    QString* m_mediaSrcPath;
-    CameraWorker* m_vidWorker;
+    MediaFile m_mediafile;
 };
 
 #endif // VIDEOPREVIEWWIDGET_H

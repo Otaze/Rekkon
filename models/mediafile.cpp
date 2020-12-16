@@ -4,38 +4,19 @@ MediaFile::MediaFile(MediaType type,
                      string filepath,
                      string filename,
                      long duration,
-                     unsigned char* thumbnail_image,
-                     unsigned int thumbnail_width,
-                     unsigned int thumbnail_height)
+                     Mat * thumbnail)
 {
     m_type = type;
     m_filepath = filepath;
     m_filename = filename;
     m_duration = duration;
-    m_thumbnail_image = thumbnail_image;
-    m_thumbnail_width = thumbnail_width;
-    m_thumbnail_height = thumbnail_height;
+    m_thumbnail = thumbnail;
 }
 
 
 MediaFile::~MediaFile()
 {
-    delete m_thumbnail_image;
-}
-
-unsigned int MediaFile::thumbnailHeight() const
-{
-    return m_thumbnail_height;
-}
-
-unsigned int MediaFile::thumbnailWidth() const
-{
-    return m_thumbnail_width;
-}
-
-unsigned char *MediaFile::thumbnailImage() const
-{
-    return m_thumbnail_image;
+    delete m_thumbnail;
 }
 
 long MediaFile::duration() const
@@ -56,4 +37,9 @@ string MediaFile::filepath() const
 MediaType MediaFile::type() const
 {
     return m_type;
+}
+
+Mat *MediaFile::thumbnail() const
+{
+    return m_thumbnail;
 }

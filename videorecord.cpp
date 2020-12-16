@@ -91,45 +91,6 @@ void VideoRecord::setup()
 
     m_camThread->start();
 
-
-
-/*
-    m_cam2Thread = new QThread();
-
-    CameraWorker *workerCamera2 = new CameraWorker();
-    QTimer *workerTriggerCamera2 = new QTimer();
-    workerTriggerCamera2->setInterval(30);
-
-    connect(workerTriggerCamera2, SIGNAL(timeout()), workerCamera2, SLOT(signalProcessImage()));
-    connect(m_cam2Thread, SIGNAL(finished()), workerCamera2, SLOT(deleteLater()));
-    connect(m_cam2Thread, SIGNAL(finished()), workerTriggerCamera2, SLOT(deleteLater()));
-    connect(this, SIGNAL(sendSetupCam2(int)), workerCamera2, SLOT(setupCamera(int)));
-    connect(workerCamera2, SIGNAL(sendFrame(cv::Mat*)), this, SLOT(receiveFrameCamera2(cv::Mat*)));
-    emit sendSetupCam2(0
-                       );
-    workerTriggerCamera2->start();
-    workerCamera2->moveToThread(m_cam2Thread);
-    workerTriggerCamera2->moveToThread(m_cam2Thread);
-
-    m_cam2Thread->start();*/
-
-
-
-  /*  m_recThread = new QThread();
-    RecordWorker *recordWorker = new RecordWorker();
-
-    connect(worker, SIGNAL(sendFrame(cv::Mat*)), recordWorker, SLOT(recordFrame(cv::Mat*)));
-   // connect(workerCamera2, SIGNAL(sendFrame(cv::Mat*)), recordWorker, SLOT(recordFrame(cv::Mat*)));
-    connect(m_recThread, SIGNAL(finished()), recordWorker, SLOT(deleteLater()));
-    connect(this, SIGNAL(startRecord(std::string)), recordWorker, SLOT(startRecord(std::string)));
-    connect(this, SIGNAL(stopRecord()), recordWorker, SLOT(stopRecord()));
-    connect(this, SIGNAL(pauseRecord()), recordWorker, SLOT(pauseRecord()));
-    connect(this, SIGNAL(resumeRecord()), recordWorker, SLOT(resumeRecord()));
-    connect(this, SIGNAL(setCameraFPS(const unsigned int)), recordWorker, SLOT(setCameraFPS(const unsigned int)));
-    connect(this, SIGNAL(setImageSize(const unsigned int,const unsigned int)), recordWorker, SLOT(setImageSize(const unsigned int,const unsigned int)));
-
-    recordWorker->moveToThread(m_recThread);
-    m_recThread->start();*/
 }
 
 void VideoRecord::restartVideoRecordProcessing()

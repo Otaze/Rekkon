@@ -5,7 +5,7 @@
 #include <vector>
 #include "videothumbnailwidget.h"
 #include <filesystem>
-#include "models/settingsstructure.h"
+#include "controllers/mediaservice.h"
 
 namespace Ui {
 class VideoList;
@@ -23,7 +23,7 @@ public:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
-    VideoThumbnailWidget* addVideoThumbnail(const QString filename);
+    VideoThumbnailWidget* addVideoThumbnail(MediaFile * mFile);
 
 signals:
     void selectVideoPlay(QString);
@@ -37,7 +37,7 @@ private slots:
 private:
     Ui::VideoList *ui;
     std::vector<VideoThumbnailWidget*>* m_thumbnailWidVector;
-    SettingsStructure* m_settings;
+    MediaService* m_mediaService;
 };
 
 #endif // VIDEOLIST_H

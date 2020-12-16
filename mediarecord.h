@@ -1,5 +1,5 @@
-#ifndef VIDEORECORD_H
-#define VIDEORECORD_H
+#ifndef MEDIARECORD_H
+#define MEDIARECORD_H
 
 #include <QWidget>
 #include <QDateTime>
@@ -18,21 +18,21 @@
 #include <thread>
 
 namespace Ui {
-class VideoRecord;
+class MediaRecord;
 }
-class VideoRecord : public QWidget
+class MediaRecord : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VideoRecord(QWidget *parent = nullptr);
-    ~VideoRecord();
+    explicit MediaRecord(QWidget *parent = nullptr);
+    ~MediaRecord();
     void startRecordVideo();
     void pauseRecordVideo();
     void stopRecordVideo();
     void screenshot();
-    void restartVideoRecordProcessing();
-    void stopVideoRecordProcessing();
+    void restartMediaRecordProcessing();
+    void stopMediaRecordProcessing();
     void captureStill();
 
     bool isRecording() const;
@@ -54,11 +54,11 @@ private slots:
     void on_captureStillBtn_clicked();
 
 signals:
-    void showVideoList();
+    void showMediaList();
     void showSettings();
 
 private:
-    Ui::VideoRecord *ui;
+    Ui::MediaRecord *ui;
     QThread *m_camThread;
     QThread *m_cam2Thread;
     QThread *m_recThread;
@@ -97,4 +97,4 @@ private:
     void removeMuxThread();
 };
 
-#endif // VIDEORECORD_H
+#endif // MEDIARECORD_H

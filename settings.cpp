@@ -106,7 +106,7 @@ void Settings::on_backBtn_clicked()
     m_settings->m_previewStillHeight = previewStillRes.height;
 
     m_settings->save("/opt/Rekkon/config.xml");
-    emit selectVideoRecord();
+    emit selectMediaRecord();
 }
 
 Settings::Resolution Settings::getResolutionFromHeight(int16_t height)

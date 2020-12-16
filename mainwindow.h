@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 #include "videoplay.h"
-#include "videorecord.h"
-#include "videolist.h"
+#include "mediarecord.h"
+#include "medialist.h"
 #include "settings.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,8 +21,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
 
     static const uint16_t VIDEOPLAY_WIDGET = 2;
-    static const uint16_t VIDEORECORD_WIDGET = 0;
-    static const uint16_t VIDEOLIST_WIDGET = 1;
+    static const uint16_t MEDIARECORD_WIDGET = 0;
+    static const uint16_t MEDIALIST_WIDGET = 1;
     static const uint16_t SETTINGS_WIDGET = 3;
 
 protected:
@@ -30,8 +30,8 @@ protected:
 
 private slots:
     void setToVideoPlayView(QString vidPath);
-    void setToVideoListView();
-    void setToVideoRecordView();
+    void setToMediaListView();
+    void setToMediaRecordView();
     void setToSettingsView();
 
 signals:
@@ -41,8 +41,8 @@ signals:
 private:
     Ui::MainWindow *ui;
     VideoPlay *videoPlayWidget;
-    VideoRecord *videoRecordWidget;
-    VideoList * videoListWidget;
+    MediaRecord *mediaRecordWidget;
+    MediaList * mediaListWidget;
     Settings *settingsWidget;
 
 

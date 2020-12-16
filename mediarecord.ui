@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VideoRecord</class>
+ <class>MediaRecord</class>
  <widget class="QWidget" name="VideoRecord">
   <property name="geometry">
    <rect>

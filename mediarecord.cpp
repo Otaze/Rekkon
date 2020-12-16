@@ -1,9 +1,9 @@
-#include "videorecord.h"
-#include "ui_videorecord.h"
+#include "mediarecord.h"
+#include "ui_mediarecord.h"
 
-VideoRecord::VideoRecord(QWidget *parent) :
+MediaRecord::MediaRecord(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::VideoRecord),
+    ui(new Ui::MediaRecord),
     m_screenshoting(false),
     m_isRecording(false),
     m_isPaused(false),
@@ -38,7 +38,7 @@ VideoRecord::VideoRecord(QWidget *parent) :
 
      setup();
 }
-VideoRecord::~VideoRecord()
+MediaRecord::~MediaRecord()
 {
    if (m_camThread->isRunning()) { m_camThread->quit(); m_camThread->wait(); }
    if (m_cam2Thread->isRunning()) { m_cam2Thread->quit(); m_cam2Thread->wait(); }
@@ -56,7 +56,7 @@ VideoRecord::~VideoRecord()
 }
 
 
-void VideoRecord::removeMuxThread()
+void MediaRecord::removeMuxThread()
 {
     if (m_mux_clean_thread)
     {
@@ -65,7 +65,7 @@ void VideoRecord::removeMuxThread()
     }
 }
 
-void VideoRecord::setup()
+void MediaRecord::setup()
 {
     m_audioWorker = new AudioWorker;
     m_rekkon_cam_worker = new RekkonCamWorker();
@@ -93,20 +93,20 @@ void VideoRecord::setup()
 
 }
 
-void VideoRecord::restartVideoRecordProcessing()
+void MediaRecord::restartMediaRecordProcessing()
 {
     // reload cam settings
     setRekkonCamSizeSettings();
     startCameraProcessing();
 }
 
-void VideoRecord::stopVideoRecordProcessing()
+void MediaRecord::stopMediaRecordProcessing()
 {
     if (m_isRecording) stopRecordVideo();
     stopCameraProcessing();
 }
 
-void VideoRecord::setRekkonCamSizeSettings()
+void MediaRecord::setRekkonCamSizeSettings()
 {
     m_rekkon_cam_worker->setVideoRecordSize(m_settings->m_recordVideoWidth, m_settings->m_recordVideoHeight);
     m_rekkon_cam_worker->setStillRecordSize(m_settings->m_recordStillWidth, m_settings->m_recordStillHeight);
@@ -114,14 +114,14 @@ void VideoRecord::setRekkonCamSizeSettings()
     m_rekkon_cam_worker->setStillPreviewSize(m_settings->m_previewStillWidth, m_settings->m_previewStillHeight);
 }
 
-void VideoRecord::reloadCamera()
+void MediaRecord::reloadCamera()
 {
     m_rekkon_cam_worker->releaseCamera();
     m_rekkon_cam_worker->openCamera();
 }
 
 
-void VideoRecord::reloadCameraMode()
+void MediaRecord::reloadCameraMode()
 {
     // TO DO: change to right function when photo functions are ready in RekkonMMALCamera
     if (m_isStillModeEnabled)
@@ -141,13 +141,13 @@ void VideoRecord::reloadCameraMode()
 
 }
 
-void VideoRecord::startCameraProcessing()
+void MediaRecord::startCameraProcessing()
 {
     reloadCameraMode();
     m_rekkon_cam_worker->resume();
 }
 
-void VideoRecord::stopCameraProcessing()
+void MediaRecord::stopCameraProcessing()
 {
     m_rekkon_cam_worker->pause();
     m_rekkon_cam_worker->stopVideoPreview();
@@ -157,12 +157,12 @@ void VideoRecord::stopCameraProcessing()
 }
 
 
-bool VideoRecord::isRecording() const
+bool MediaRecord::isRecording() const
 {
     return m_isRecording;
 }
 
-void VideoRecord::receiveFrame(cv::Mat* frame)
+void MediaRecord::receiveFrame(cv::Mat* frame)
 {
     QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_RGB888);
     //QImage output((const unsigned char *)frame->data, frame->cols, frame->rows, QImage::Format_BGR888);
@@ -174,7 +174,7 @@ void VideoRecord::receiveFrame(cv::Mat* frame)
 }
 
 
-void VideoRecord::startRecordVideo()
+void MediaRecord::startRecordVideo()
 {
     if (m_isPaused)
     {
@@ -215,7 +215,7 @@ void VideoRecord::startRecordVideo()
     ui->recordBtn->hide();
 }
 
-void VideoRecord::pauseRecordVideo()
+void MediaRecord::pauseRecordVideo()
 {
     m_isPaused = true;
 
@@ -234,7 +234,7 @@ void VideoRecord::pauseRecordVideo()
         m_audioWorker->pauseRecord();
 }
 
-void VideoRecord::stopRecordVideo()
+void MediaRecord::stopRecordVideo()
 {
     // Disable record mode
     // show hidden buttons by record mode
@@ -259,7 +259,7 @@ void VideoRecord::stopRecordVideo()
 
 }
 
-void VideoRecord::muxVideoAudioAndClean( string *filepath_video, string *filepath_audio, string *ext_video,unsigned int fps,bool audio_ready)
+void MediaRecord::muxVideoAudioAndClean( string *filepath_video, string *filepath_audio, string *ext_video,unsigned int fps,bool audio_ready)
 {
     string ffmpegCmd = "ffmpeg ";
     ffmpegCmd.append("-r ");
@@ -283,13 +283,13 @@ void VideoRecord::muxVideoAudioAndClean( string *filepath_video, string *filepat
 }
 
 
-void VideoRecord::errorRecord()
+void MediaRecord::errorRecord()
 {
     stopRecordVideo();
 }
 
 
-void VideoRecord::captureStill()
+void MediaRecord::captureStill()
 {
     // create filename and path
     auto t = std::time(nullptr);
@@ -303,29 +303,29 @@ void VideoRecord::captureStill()
 }
 
 
-void VideoRecord::on_recordBtn_clicked()
+void MediaRecord::on_recordBtn_clicked()
 {
     startRecordVideo();
 }
 
-void VideoRecord::on_pauseBtn_clicked()
+void MediaRecord::on_pauseBtn_clicked()
 {
     pauseRecordVideo();
 }
 
-void VideoRecord::on_stopBtn_clicked()
+void MediaRecord::on_stopBtn_clicked()
 {
     stopRecordVideo();
 }
 
 
-void VideoRecord::on_mediaBtn_clicked()
+void MediaRecord::on_mediaBtn_clicked()
 {
     stopCameraProcessing();
-    emit showVideoList();
+    emit showMediaList();
 }
 
-void VideoRecord::on_closeAppBtn_clicked()
+void MediaRecord::on_closeAppBtn_clicked()
 {
 
     m_rekkon_cam_worker->pause();
@@ -333,20 +333,20 @@ void VideoRecord::on_closeAppBtn_clicked()
         stopRecordVideo();
         m_mux_clean_thread->join();
     }*/
-    stopVideoRecordProcessing();
+    stopMediaRecordProcessing();
     m_camThread->quit();
     QApplication::quit();
 }
 
-void VideoRecord::on_settingsBtn_clicked()
+void MediaRecord::on_settingsBtn_clicked()
 {
-    stopVideoRecordProcessing();
+    stopMediaRecordProcessing();
     emit showSettings();
 }
 
-void VideoRecord::on_stillVideoModeBtn_clicked()
+void MediaRecord::on_stillVideoModeBtn_clicked()
 {
-    stopVideoRecordProcessing();
+    stopMediaRecordProcessing();
     m_isStillModeEnabled = !m_isStillModeEnabled;
     if (m_isStillModeEnabled)
     {
@@ -369,7 +369,7 @@ void VideoRecord::on_stillVideoModeBtn_clicked()
     startCameraProcessing();
 }
 
-void VideoRecord::on_captureStillBtn_clicked()
+void MediaRecord::on_captureStillBtn_clicked()
 {
     captureStill();
 }

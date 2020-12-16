@@ -28,7 +28,7 @@ public:
     void setMediaSource(const QString mediaPath);
 
 signals:
-    void showVideoList();
+    void showMediaList();
 
 private slots:
     void on_pauseBtn_clicked();

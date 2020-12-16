@@ -76,7 +76,7 @@ void VideoPlay::on_stopBtn_clicked()
 void VideoPlay::on_backBtn_clicked()
 {
     stopVideo();
-    emit showVideoList();
+    emit showMediaList();
 }
 
 void VideoPlay::setDuration(int duration) {

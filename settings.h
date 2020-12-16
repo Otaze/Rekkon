@@ -29,7 +29,7 @@ protected:
     Resolution getResolutionFromHeight(int16_t height);
 
 signals:
-     void selectVideoRecord();
+     void selectMediaRecord();
 
 private slots:
 

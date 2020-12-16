@@ -1,24 +1,24 @@
-#include "videolist.h"
-#include "ui_videolist.h"
+#include "medialist.h"
+#include "ui_medialist.h"
 #include <QDebug>
 #include <QThread>
 
-VideoList::VideoList(QWidget *parent) :
+MediaList::MediaList(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::VideoList)
+    ui(new Ui::MediaList)
 {
     ui->setupUi(this);
     m_thumbnailWidVector = new std::vector<VideoThumbnailWidget*>;
     m_mediaService = MediaService::instance();
 }
 
-VideoList::~VideoList()
+MediaList::~MediaList()
 {
     delete m_thumbnailWidVector;
     delete ui;
 }
 
-void VideoList::refreshList()
+void MediaList::refreshList()
 {
 
     for (VideoThumbnailWidget* vidThumbWid : *m_thumbnailWidVector)
@@ -40,7 +40,7 @@ void VideoList::refreshList()
 }
 
 
-VideoThumbnailWidget* VideoList::addVideoThumbnail(MediaFile * mFile)
+VideoThumbnailWidget* MediaList::addVideoThumbnail(MediaFile * mFile)
 {
     int16_t file_counter = ui->vidListGridLayout->count();
     int16_t columns_count = 3;
@@ -64,12 +64,12 @@ VideoThumbnailWidget* VideoList::addVideoThumbnail(MediaFile * mFile)
 
 }
 
-bool VideoList::isEmpty()
+bool MediaList::isEmpty()
 {
     return this->m_thumbnailWidVector->empty();
 }
 
-bool VideoList::eventFilter(QObject *obj, QEvent *event) {
+bool MediaList::eventFilter(QObject *obj, QEvent *event) {
 
     // normal event handling
 
@@ -85,12 +85,12 @@ bool VideoList::eventFilter(QObject *obj, QEvent *event) {
 
 }
 
-void VideoList::on_refreshBtn_clicked()
+void MediaList::on_refreshBtn_clicked()
 {
     refreshList();
 }
 
-void VideoList::on_backBtn_clicked()
+void MediaList::on_backBtn_clicked()
 {
-    emit selectVideoRecord();
+    emit selectMediaRecord();
 }

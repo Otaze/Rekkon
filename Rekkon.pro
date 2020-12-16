@@ -28,9 +28,9 @@ SOURCES += \
     models/settingsstructure.cpp \
     settings.cpp \
     utils/utils.cpp \
-    videolist.cpp \
+    medialist.cpp \
     videoplay.cpp \
-    videorecord.cpp \
+    mediarecord.cpp \
     videothumbnailwidget.cpp
 
 
@@ -44,17 +44,17 @@ HEADERS += \
     models/settingsstructure.h \
     settings.h \
     utils/utils.h \
-    videolist.h \
+    medialist.h \
     videoplay.h \
-    videorecord.h \
+    mediarecord.h \
     videothumbnailwidget.h
 
 FORMS += \
     mainwindow.ui \
     settings.ui \
-    videolist.ui \
+    medialist.ui \
     videoplay.ui \
-    videorecord.ui \
+    mediarecord.ui \
     videothumbnailwidget.ui
 
 

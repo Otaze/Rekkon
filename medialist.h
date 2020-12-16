@@ -1,5 +1,5 @@
-#ifndef VIDEOLIST_H
-#define VIDEOLIST_H
+#ifndef MEDIALIST_H
+#define MEDIALIST_H
 
 #include <QWidget>
 #include <vector>
@@ -8,16 +8,16 @@
 #include "controllers/mediaservice.h"
 
 namespace Ui {
-class VideoList;
+class MediaList;
 }
 
-class VideoList : public QWidget
+class MediaList : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VideoList(QWidget *parent = nullptr);
-    ~VideoList();
+    explicit MediaList(QWidget *parent = nullptr);
+    ~MediaList();
     void refreshList();
     bool isEmpty();
 
@@ -27,7 +27,7 @@ protected:
 
 signals:
     void selectVideoPlay(QString);
-    void selectVideoRecord();
+    void selectMediaRecord();
 
 private slots:
     void on_refreshBtn_clicked();
@@ -35,9 +35,9 @@ private slots:
     void on_backBtn_clicked();
 
 private:
-    Ui::VideoList *ui;
+    Ui::MediaList *ui;
     std::vector<VideoThumbnailWidget*>* m_thumbnailWidVector;
     MediaService* m_mediaService;
 };
 
-#endif // VIDEOLIST_H
+#endif // MEDIALIST_H

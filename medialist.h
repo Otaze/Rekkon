@@ -20,19 +20,22 @@ public:
     ~MediaList();
     void refreshList();
     bool isEmpty();
+    void updateUI();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     VideoThumbnailWidget* addVideoThumbnail(MediaFile * mFile);
 
 signals:
-    void selectVideoPlay(QString);
+    void selectMediaDisplay(QString);
     void selectMediaRecord();
 
 private slots:
     void on_refreshBtn_clicked();
-
     void on_backBtn_clicked();
+
+    void clearThumbnails();
+    void populateThumbnails();
 
 private:
     Ui::MediaList *ui;

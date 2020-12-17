@@ -24,6 +24,7 @@ SOURCES += \
     cameraworker.cpp \
     main.cpp \
     mainwindow.cpp \
+    mediadisplay.cpp \
     models/mediafile.cpp \
     models/settingsstructure.cpp \
     settings.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     controllers/rekkoncamworker.h \
     cameraworker.h \
     mainwindow.h \
+    mediadisplay.h \
     models/mediafile.h \
     models/settingsstructure.h \
     settings.h \
@@ -51,6 +53,7 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui \
+    mediadisplay.ui \
     settings.ui \
     medialist.ui \
     videoplay.ui \

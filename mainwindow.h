@@ -5,6 +5,7 @@
 #include "videoplay.h"
 #include "mediarecord.h"
 #include "medialist.h"
+#include "mediadisplay.h"
 #include "settings.h"
 
 QT_BEGIN_NAMESPACE
@@ -23,13 +24,15 @@ public:
     static const uint16_t VIDEOPLAY_WIDGET = 2;
     static const uint16_t MEDIARECORD_WIDGET = 0;
     static const uint16_t MEDIALIST_WIDGET = 1;
-    static const uint16_t SETTINGS_WIDGET = 3;
+    static const uint16_t MEDIADISPLAY_WIDGET = 3;
+    static const uint16_t SETTINGS_WIDGET = 4;
 
 protected:
     void changeVideoView(uint16_t view);
 
 private slots:
     void setToVideoPlayView(QString vidPath);
+    void setToMediaDisplayView(QString vidPath);
     void setToMediaListView();
     void setToMediaRecordView();
     void setToSettingsView();
@@ -43,8 +46,8 @@ private:
     VideoPlay *videoPlayWidget;
     MediaRecord *mediaRecordWidget;
     MediaList * mediaListWidget;
+    MediaDisplay *mediaDisplayWidget;
     Settings *settingsWidget;
-
 
 };
 

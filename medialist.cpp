@@ -21,21 +21,34 @@ MediaList::~MediaList()
 void MediaList::refreshList()
 {
 
+    m_mediaService->refreshList();
+    updateUI();
+}
+
+void MediaList::clearThumbnails()
+{
     for (VideoThumbnailWidget* vidThumbWid : *m_thumbnailWidVector)
     {
         ui->vidListGridLayout->removeWidget(vidThumbWid);
         //delete vidThumbWid;
     }
     m_thumbnailWidVector->clear();
+}
 
-    m_mediaService->refreshList();
-    for(MediaFile * file : m_mediaService->mediaFileList())
+
+void MediaList::updateUI()
+{
+    clearThumbnails();
+    populateThumbnails();
+}
+
+
+void MediaList::populateThumbnails()
+{
+    for(MediaFile * file : *(m_mediaService->mediaFileList()))
     {
         addVideoThumbnail(file);
-    }
-    for (VideoThumbnailWidget* vidThumbWid : *m_thumbnailWidVector)
-    {
-        vidThumbWid->updateUI();
+        QCoreApplication::processEvents();
     }
 }
 
@@ -76,13 +89,11 @@ bool MediaList::eventFilter(QObject *obj, QEvent *event) {
     bool ret = QObject::eventFilter(obj, event);
 
 
-
     if (event->type() == QEvent::MouseButtonRelease) {
-        emit selectVideoPlay(QString::fromStdString(((VideoThumbnailWidget*)obj)->mediaFile().filepath()));
+        emit selectMediaDisplay(QString::fromStdString(((VideoThumbnailWidget*)obj)->mediaFile().filepath()));
     }
 
     return ret;
-
 }
 
 void MediaList::on_refreshBtn_clicked()

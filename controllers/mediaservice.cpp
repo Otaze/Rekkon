@@ -19,6 +19,7 @@ MediaService * MediaService::instance()
 
 MediaService::MediaService(){
     m_settings = SettingsStructure::instance();
+    m_mediaFile_list = new vector<MediaFile*>();
 }
 
 MediaService::~MediaService(){
@@ -30,8 +31,9 @@ MediaService::~MediaService(){
  * Returns the list of media files in the folder defined by the config file
  * @return (vector<MediaFile>)
  */
-vector<MediaFile*> MediaService::mediaFileList() const
+vector<MediaFile*>* MediaService::mediaFileList() const
 {
+    lock_guard<std::mutex> lock(m_mutex);
     return m_mediaFile_list;
 }
 
@@ -41,14 +43,16 @@ vector<MediaFile*> MediaService::mediaFileList() const
  */
 void MediaService::refreshList()
 {
+    lock_guard<std::mutex> lock(m_mutex);
+
     MediaFile * fileToBeAdded;
     m_settings->load();
     cerr << "delete MediaFiles" << endl;
-    for (MediaFile * mFile : m_mediaFile_list)
+    for (MediaFile * mFile : *m_mediaFile_list)
     {
         delete mFile;
     }
-    m_mediaFile_list.clear();
+    m_mediaFile_list->clear();
 
     for (const auto & file : std::filesystem::recursive_directory_iterator(m_settings->m_videoFolder))
     {
@@ -68,7 +72,7 @@ void MediaService::refreshList()
         }
 
         if (fileToBeAdded != NULL)
-            m_mediaFile_list.push_back(fileToBeAdded);
+            m_mediaFile_list->push_back(fileToBeAdded);
     }
 }
 
